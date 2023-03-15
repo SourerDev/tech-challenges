@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from "@prisma/client"
-import util from "../utils/index"
+import util, { generateToken } from "../utils/index"
 
 const prisma = new PrismaClient()
 
@@ -16,7 +16,7 @@ export async function signUp(req: Request, res: Response) {
         }
     })
 
-    if (exist) res.status(401).json({message:"This user already exist"})
+    if (exist) res.status(401).json({ message: "This user already exist" })
     else {
         const hashPassword = await util.hashPassword(password)
         const user = await prisma.user.create({
@@ -25,7 +25,7 @@ export async function signUp(req: Request, res: Response) {
                 password: hashPassword
             }
         })
-        res.send({message:"Successful registration",user:{ id: user.id, name: user.name, email: user.email }})
+        res.send({ message: "Successful registration", user: { id: user.id, name: user.name, email: user.email } })
     }
 }
 
@@ -39,13 +39,37 @@ export async function logIn(req: Request, res: Response) {
     if (!user) res.status(401).json({ message: 'Incorrect email or password.' });
     else {
         const passwordMatch = await util.verifyPassword(user.password, password);
-        if (!passwordMatch)res.status(401).json({ message: 'Incorrect email or password.' });
+        if (!passwordMatch) res.status(401).json({ message: 'Incorrect email or password.' });
         else {
-            res.status(200).json({ message: 'Sign up successful.',user:{
-                id:user.id,
-                name: user.name,
-                email:user.email
-            } });
+            const token = generateToken({ id: user.id, name: user.email });
+            res.status(200).json({
+                message: 'Sign up successful.', user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    token
+                }
+            });
         }
+    }
+}
+
+export async function updatedUser(req: Request, res: Response) {
+    const { id, name } = req.body
+
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: { name },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                password: false,
+            }
+        })
+        res.json({ message: 'User Updated', user: updatedUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', err:error});
     }
 }
