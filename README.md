@@ -6,3 +6,8 @@ The aim of this repository is to store my solutions and showcase how I've approa
 In this repository, you'll find solutions to the challenges that I've solved so far. Each solution includes a description of the problem, the corresponding code, and a detailed explanation of the approach used.
 
 If you love programming and are looking for new ways to improve your skills, I invite you to explore this repository and use the solutions as a source of inspiration and learning.
+
+- ### [Login Challenge](https://github.com/SourerDev/tech-challenges/loginchallenge)
+  <strong>Backend:</strong> This programming challenge involves creating a secure login system that uses JSON Web Tokens (JWT) to authenticate users on the server side using Express and PostgreSQL.
+  
+  Additionally, the validity of the JWT must be verified using Thunder Client or any similar tool.
